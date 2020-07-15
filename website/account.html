@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en" ng-app="displayPage">
+
+<head>
+    <title>JobHub - My Account</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap & CSS -->
+    <link rel="stylesheet" href="bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <!-- jQuery, Popper.js, Bootstrap JS -->
+    <script src="js/jquery-3.2.1.slim.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <!-- web3.js, AngularJS -->
+    <script src="js/web3.min.js"></script>
+    <script src="js/angular.min.js"></script>
+
+    <!-- Scripts & Contracts -->
+    <script src="js/contractInfo.js"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/bundledSearch.js"></script>
+    <script src="js/checkUser.js"></script>
+    <script src="js/displayAccounts.js"></script>
+
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-3">
+        <a class="navbar-brand" href="index.html">JobHub</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <!-- Left side -->
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Jobs
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="jobList.html">Job List</a>
+                        <a class="dropdown-item" href="openJobs.html"> Open Jobs </a>
+                        <a class="dropdown-item" href="postJob.html">Post a Job</a>
+                    </div>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" href="accountList.html">Freelancers</a>
+                </li>
+
+            </ul>
+
+            <!-- Search bar -->
+            <input class="col-4 form-control mr-sm-2" type="text" placeholder="Search" id="searchInput"/>
+            <div class="dropdown">
+              <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Search
+              </button>
+
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="#" id="searchJobsButton">Search Jobs</a>
+                <a class="dropdown-item" href="#" id="searchUsersButton">Search Users</a>
+              </div>
+            </div>
+
+            <!-- Right side -->
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a id="welcome" class="nav-link" href="register.html">Not Registered</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Settings
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" id="network" href="networkInfo.html">Network: Not detected</a>
+                        <a class="dropdown-item" href="account.html">My Account</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Show Account details -->
+    <div class="container" ng-controller="showAccount">
+        <div class="row justify-content-center">
+            <h1> Account Details </h1>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-8 mt-3 p-3" style="background-color:white; border-radius:8px; word-wrap: break-word;">
+                <h5><b>First name:</b> {{account.firstName}}</h5>
+                <h5><b>Last name:</b> {{account.lastName}}</h5>
+                <h5><b> EMAIL:</b> {{account.email}} </h5>
+                <h5><b>Biography:</b></h5>
+                <p class="pl-2" style="border-left: 3px solid #BDBDBD;">{{account.biography}}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-3" ng-controller="showAccountJobs">
+    <div class="row">
+        <!-- Show all jobs a user has created -->
+        <div class="col-4">
+            <h4>Jobs created:</h4>
+            <div ng-repeat="employerJob in employerJobs track by $index">
+                <div class="row justify-content-center">
+                    <div id="employerJobCard{{employerJob.id}}" class="col-10 mt-3 p-3" style="background-color:white; border-radius:8px;  word-wrap: break-word;   ">
+                        <a href="./job.html?{{employerJob.id}}"><h3> {{employerJob.title}} </h3></a>
+                        <p class="pl-2" style="border-left: 3px solid #BDBDBD;">{{employerJob.description}}</p>
+                        <h5>Payment: Ξ {{employerJob.payment}} (ETH)</h5>
+                        <p class="m-0 float-right">{{employerJob.status}} </p>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="!employerJobs.length" class="text-center">
+                <p>User has not created any jobs</p>
+            </div>
+        </div>
+        <!-- Show all jobs a user has been assigned to -->
+        <div class="col-4">
+            <h4>Jobs assigned:</h4>
+            <div ng-repeat="workerJob in workerJobs track by $index">
+                <div class="row justify-content-center">
+                    <div id="workerJobCard{{workerJob.id}}" class="col-10 mt-3 p-3" style="background-color:white; border-radius:8px;  word-wrap: break-word;">
+                        <!--<h2>{{workerJob.id}}</h2>-->
+                        <a href="./job.html?{{workerJob.id}}"><h3> {{workerJob.title}} </h3></a>
+                        <p class="pl-2" style="border-left: 3px solid #BDBDBD;">{{workerJob.description}}</p>
+                        <h5>Payment: Ξ {{workerJob.payment}} (ETH)</h5>
+                        <p class="m-0 float-right">{{workerJob.status}} </p>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="!workerJobs.length" class="text-center">
+                <p>User has not previously been assigned any jobs.</p>
+            </div>
+        </div>
+        <!-- Show all reviews a user has recieved -->
+        <div class="col-4">
+            <div ng-controller="showAccountReviews">
+                <h4>User reviews:</h4>
+                <div ng-repeat="review in reviews">
+                    <div class="col-10 mt-4 p-3" style="background-color:white; border-radius:8px; word-wrap: break-word;">
+                        <p><b>Comment: </b>{{review.reviewText}}</p>
+                        <p><b>Rating: </b>{{review.stars}}/5</p>
+                        <p><b>From: </b><a href="./account.html?{{review.reviewer}}"> {{review.reviewer}}</a></p>
+                        <a href="./job.html?{{reviewjobID}}">See job</a>
+                    </div>
+                </div>
+                <div ng-show="!reviews.length" class="text-center">
+                    <p>User has not received any reviews</p>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+
+
+</body>
+
+</html>

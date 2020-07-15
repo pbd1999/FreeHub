@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en" ng-app="displayPage">
+
+<head>
+    <title>JobHub - Job</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap & CSS -->
+    <link rel="stylesheet" href="bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <!-- jQuery, Popper.js, Bootstrap JS -->
+    <script src="js/jquery-3.2.1.slim.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <!-- web3.js, AngularJS -->
+    <script src="js/web3.min.js"></script>
+    <script src="js/angular.min.js"></script>
+
+    <!-- Scripts & Contracts -->
+    <script src="js/contractInfo.js"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/displayJobs.js"></script>
+    <script src="js/JobPostInteraction.js"></script>
+    <script src="js/reviewInteraction.js"></script>
+    <script src="js/bundledSearch.js"></script>
+    <script src="js/profanities.js"></script>
+
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-3">
+    <a class="navbar-brand" href="index.html">JobHub</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <!-- Left side -->
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarJobDropdown" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    Jobs
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarJobDropdown">
+                    <a class="dropdown-item" href="jobList.html">Job List</a>
+                    <a class="dropdown-item" href="openJobs.html"> Open Jobs </a>
+                    <a class="dropdown-item" href="postJob.html">Post a Job</a>
+                </div>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link" href="accountList.html">Freelancers</a>
+            </li>
+
+        </ul>
+
+        <!-- Search bar -->
+        <input class="col-4 form-control mr-sm-2" type="text" placeholder="Search" id="searchInput"/>
+        <div class="dropdown">
+            <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Search
+            </button>
+
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="#" id="searchJobsButton">Search Jobs</a>
+                <a class="dropdown-item" href="#" id="searchUsersButton">Search Users</a>
+            </div>
+        </div>
+
+        <!-- Right side -->
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a id="welcome" class="nav-link" href="register.html">Not Registered</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarSettingsDropdown" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    Settings
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarSettingsDropdown">
+                    <a class="dropdown-item" id="network" href="networkInfo.html">Network: Not detected</a>
+                    <a class="dropdown-item" href="account.html">My Account</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container" ng-controller="checkOwner">
+    <div ng-controller="acceptedApplicant">
+        <div class="row justify-content-center" ng-controller="showJob">
+            <!-- Display job details and actions -->
+            <div id="jobCard" class="col-8 mt-3 p-3" style="background-color:white; border-radius:8px; word-wrap: break-word;">
+                <h2> {{job.title}} </h2>
+                <p class="pl-2" style="border-left: 3px solid #BDBDBD;"> <b>Description: </b> {{job.description}} </p>
+                <h5> Payment: Ξ {{job.payment}} (ETH)</h5>
+                <div ng-show="applicantAccepted">
+                    <h5>Accepted Worker: <a href="./account.html?{{worker}}">{{worker}}</a> </h5>
+                </div>
+                <div class="row justify-content-center" ng-show="!applicantAccepted">
+                    <button type="button" id="applyButton" class="btn btn-primary m-1">
+                        Apply for this job
+                    </button>
+                </div>
+                <div class="row justify-content-center p-3">
+                    <div ng-show="applicantAccepted && isOwner">
+                        <button type="button" id="completeModalButton" class="btn btn-success m-1" data-toggle="modal"
+                                data-target="#completeJobModal">
+                            Complete Job
+                        </button>
+                    </div>
+                    <div ng-show="isOwner">
+                        <a class="btn btn-danger m-1" id="cancelJobButton" href="#"> Cancel Job </a>
+                    </div>
+                    <div ng-show="isWorker">
+                        <button type="button" id="confirmWorkButton" class="btn btn-success m-1" data-toggle="modal"
+                                data-target="#completeWorkModal">
+                            Confirm work completed
+                        </button>
+                    </div>
+                </div>
+                <p class="m-0 float-right">{{job.status}} </p>
+            </div>
+
+            <!-- Display employer details -->
+            <div class="col-3 mt-3 ml-3 p-3" style="background-color:white; border-radius:8px; word-wrap: break-word;">
+                <h4> Employer: </h4>
+                <p>{{employerInfo.bio}}</p>
+                <a href="./account.html?{{employerInfo.addr}}">Go to employers page</a>
+            </div>
+
+            <div class="col-8 mt-3">
+                <div class="row">
+                    <!-- Display Review of Work -->
+                    <div class="col-sm-6 m-0 p-0 pr-2" ng-controller="showJobReviews" ng-show="isCompleted">
+                        <div class="container p-3 m-0" style="background-color:white; border-radius:8px; word-wrap: break-word;">
+                            <h4> Review of Employer: </h4>
+                            <div ng-repeat="wReview in workerReview">
+                                <p> <b>Comment: </b>{{wReview.reviewText}}</p>
+                                <p> <b>Rating: </b>{{wReview.stars}}/5</p>
+                                <p> <b>From: </b><a href="./account.html?{{wReview.reviewer}}">{{wReview.reviewer}}</a></p>
+                            </div>
+                            <div ng-show="!workerReview.length">
+                                <h4 class="text-muted"> No  review yet </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Display Review of Employer -->
+                    <div class="col-sm-6 m-0 p-0 pl-2" ng-controller="showJobReviews" ng-show="isCompleted">
+
+                        <div class="container p-3 m-0" style="background-color:white; border-radius:8px; word-wrap: break-word;">
+                            <h4> Review of Worker: </h4>
+                            <div ng-repeat="eReview in employerReview">
+                                <p> <b>Comment: </b>{{eReview.reviewText}}</p>
+                                <p> <b>Rating: </b>{{eReview.stars}}/5</p>
+                                <p> <b>From: </b><a href="./account.html?{{eReview.reviewer}}"> {{eReview.reviewer}}</a></p>
+                            </div>
+                            <div ng-show="!employerReview.length">
+                                <h4 class="text-muted"> No review yet </h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Display Applicants -->
+                <div class="row" ng-controller="showApplicants" ng-show="!applicantAccepted && isOwner">
+                    <div class="col-sm-12 m-0 p-0" ng-controller="showJobReviews">
+                        <div class="container p-3 m-0" style="background-color:white; border-radius:8px;">
+                            <h4> Applicants: </h4>
+                            <div class="row p-3 m-3 border border-primary rounded" ng-repeat="applicant in applicants track by $index" style="overflow-wrap:break-word;">
+                                <div class="col-sm-10">
+                                    <h5><a href="./account.html?{{applicant}}">{{applicant}}</a></h5>
+                                </div>
+                                <div class="col-sm-2">
+                                    <a class="btn btn-success" href="#" ng-click="acceptApplicant($index)"> Accept </a>
+                                </div>
+                            </div>
+                            <div ng-show="!applicants.length">
+                                <h3 class="text-muted"> No applicants </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Display Employers previous reviews -->
+            <div class="col-3 mt-3 ml-3 p-3" ng-controller="showReceivedReviews" style="background-color:white; border-radius:8px; word-wrap: break-word;">
+                <h4> Reviews of Employer: </h4>
+                <div ng-repeat="receivedReview in receivedReviews">
+                    <div class="container m-0 p-0 border-bottom">
+                        <p> <b>Comment: </b>{{receivedReview.reviewText}}</p>
+                        <p> <b>Rating: </b>{{receivedReview.stars}}/5</p>
+                        <p> <b>From: </b><a href="./account.html?{{receivedReview.reviewer}}"> {{receivedReview.reviewer}}</a></p>
+                    </div>
+                </div>
+                <div ng-show="!receivedReviews.length">
+                    <h4 class="text-muted"> No reviews yet</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Complete Job Modal -->
+<div class="modal fade" id="completeJobModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Please leave a review!</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form>
+                <div class="modal-body">
+                    <p><b>Comment:</b></p>
+                    <textarea type="ReviewText" class="form-control" id="completeReviewTextInput"
+                              placeholder="Write review here" maxlength="200" onkeyup="charCount(this)"
+                              required></textarea>
+                    <small id="char-count" class="form-text text-muted float-right">Max 200 characters</small>
+                    <br/>
+                    <div class="rating text-center">
+                        <p><b>Rating:</b></p>
+                        <span class="text-center d-inline-block">
+                            <input type="radio" name="rating" id="star1Complete" value="1" onclick="completeRating(1)" required>
+                            <label for="star1Complete"class="d-block">1</label>
+                        </span>
+                        <span class="text-center d-inline-block">
+                            <input type="radio" name="rating" id="star2Complete" value="2" onclick="completeRating(2)" required>
+                            <label for="star2Complete"class="d-block">2</label>
+                        </span>
+                        <span class="text-center d-inline-block">
+                            <input type="radio" name="rating" id="star3Complete" value="3" onclick="completeRating(3)" required>
+                            <label for="star3Complete"class="d-block">3</label>
+                        </span>
+                        <span class="text-center d-inline-block">
+                            <input type="radio" name="rating" id="star4Complete" value="4" onclick="completeRating(4)" required>
+                            <label for="star4Complete"class="d-block">4</label>
+                        </span>
+                        <span class="text-center d-inline-block">
+                            <input type="radio" name="rating" id="star5Complete" value="5" onclick="completeRating(5)" required>
+                            <label for="star5Complete"class="d-block">5</label>
+                        </span>
+                    </div>
+                    <span id="completeStarRating" ng-hide="true">1</span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <a class="btn btn-success" id="completeJobButton" href="#"> Submit & Complete </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Complete Work Modal -->
+<div class="modal fade" id="completeWorkModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Please leave a review!</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form>
+                <div class="modal-body">
+                    <p><b>Comment:</b></p>
+                    <textarea type="reviewText" class="form-control" id="workReviewTextInput"
+                              placeholder="Write review here" maxlength="200" onkeyup="charCount(this)"
+                              required></textarea>
+                    <small id="char-count" class="form-text text-muted float-right">Max 200 characters</small>
+                    <br/>
+                    <div class="rating text-center">
+                        <p><b>Rating:</b></p>
+                        <span class="text-center d-inline-block">
+                            <input type="radio" name="rating" id="star1Work" value="1" onclick="workRating(1)" required>
+                            <label for="star1Work" class="d-block">1</label>
+                        </span>
+                        <span class="text-center d-inline-block">
+                            <input type="radio" name="rating" id="star2Work" value="2" onclick="workRating(2)" required>
+                            <label for="star2Work" class="d-block">2</label>
+                        </span>
+                        <span class="text-center d-inline-block">
+                            <input type="radio" name="rating" id="star3Work" value="3" onclick="workRating(3)" required>
+                            <label for="star3Work" class="d-block">3</label>
+                        </span>
+                        <span class="text-center d-inline-block">
+                            <input type="radio" name="rating" id="star4Work" value="4" onclick="workRating(4)" required>
+                            <label for="star4Work" class="d-block">4</label>
+                        </span>
+                        <span class="text-center d-inline-block">
+                            <input type="radio" name="rating" id="star5Work" value="5" onclick="workRating(5)" required>
+                            <label for="star5Work" class="d-block">5</label>
+                        </span>
+                    </div>
+                    <span id="workStarRating" ng-hide="true">1</span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <a class="btn btn-success" id="completeWorkButton" href="#"> Submit & Complete </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>

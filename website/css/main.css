@@ -1,0 +1,65 @@
+body {
+    background-color: #F0F0F0;
+}
+
+.page-content-wrapper {
+    width: 100%;
+    padding: 0 15px 15px 15px;
+    margin: 0;
+    background: #EEE;
+}
+/*
+.container {
+    background: #FFF;
+    padding: 20px;
+}
+*/
+.container-fluid {
+    background: #FFF;
+    width: 100%;
+    padding: 20px;
+    margin: 0;
+}
+
+.reg-form {
+    background-color: #FFF;
+    max-width: 400px;
+    padding: 20px;
+    margin: 0 auto;
+}
+
+.reg-form h2 {
+    margin-bottom: 20px;
+}
+
+.reg-form input {
+    margin-bottom: 15px;
+}
+
+.post-job {
+    background: #FFF;
+    max-width: 600px;
+    padding: 20px;
+    margin: 0 auto;
+}
+
+.post-job input {
+    margin-bottom: 15px;
+}
+
+#metamask {
+    max-width: 200px;
+    margin: 20px;
+}
+
+.openJob {
+  border-right: 20px solid #5cb85c;
+}
+
+.inProgressJob {
+  border-right: 20px solid orange;
+}
+
+.closedJob {
+  border-right: 20px solid #d9534f;
+}
